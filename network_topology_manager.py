@@ -1,3 +1,8 @@
+import random
+import logging
+
+logging.basicConfig(level=logging.INFO)
+
 class NetworkTopologyManager:
     def __init__(self):
         self.devices = {}
