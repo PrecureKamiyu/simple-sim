@@ -356,6 +356,6 @@ class TaskManager:
         """
         Called by offloader and others.
         The delay is calculated using network module.
+        And then the delay is recorded.
         """
-        # network_manager.calculate_delay()
         pass
