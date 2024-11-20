@@ -168,6 +168,8 @@ class ServerManager:
     def run(self):
         for server in self.context.server_list:
             server.run()
+            if server.device_status == DeviceStatus.DONE:
+                logging.info(f"Server {server.device_id} is done.")
         logging.info("Servers ran tasks.")
 
 class DeviceStatus(Enum):
@@ -217,8 +219,9 @@ class Device:
             logging.info(f"Device {self.device_id} started task {task.task_id}.")
 
         if self.current_task is None and self.tasks.empty():
-            self.device_status = DeviceStatus.DONE
-            logging.info(f"Device {self.device_id} is done.")
+            if self.device_status != DeviceStatus.CREATED:
+                self.device_status = DeviceStatus.DONE
+                logging.info(f"Device {self.device_id} is done.")
 
 
 class EdgeDevice(Device):
