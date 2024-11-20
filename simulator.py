@@ -117,6 +117,11 @@ class EdgeDeviceManager:
             logging.info("All edge devices are done.")
         return done
 
+    def run(self):
+        for device in self.context.vm_list:
+            device.run()
+        logging.info("Edge devices ran tasks.")
+
     def assign_tasks(self, tasks: list[Task]):
         num_devices = len(self.context.vm_list)
         for i, task in enumerate(tasks):
@@ -154,10 +159,17 @@ class ServerManager:
         self.working_servers_count: int = 0
 
     def is_done(self) -> bool:
-        done = all(getattr(server, 'device_status') == DeviceStatus.DONE or DeviceStatus.CREATED for server in self.context.server_list)
+        done = all(getattr(server, 'device_status') == DeviceStatus.DONE for server in self.context.server_list)
         if done:
             logging.info("All servers are done.")
         return done
+
+    def run(self):
+        for server in self.context.server_list:
+            server.run()
+            if server.device_status == DeviceStatus.DONE:
+                logging.info(f"Server {server.device_id} is done.")
+        logging.info("Servers ran tasks.")
 
     def example_distribute_load(self, load):
         for server in self.context.server_list:
@@ -176,6 +188,14 @@ class DeviceStatus(Enum):
     CREATED = "CREATED"
     WORKING = "WORKING"
     DONE    = "DONE"
+
+    def transition(self, new_state):
+        if self == DeviceStatus.CREATED and new_state == DeviceStatus.WORKING:
+            return True
+        elif self == DeviceStatus.WORKING and new_state == DeviceStatus.DONE:
+            return True
+        else:
+            return False
 
 class Device:
     def __init__(self, device_id):
@@ -215,11 +235,12 @@ class Device:
             task.status = TaskStatus.PROCESSING
             self.efforts = self.calculate_efforts(task.process_size)
             self.current_task = task
-            self.device_status = DeviceStatus.WORKING
-            logging.info(f"Device {self.device_id} started task {task.task_id}.")
+            if self.device_status.transition(DeviceStatus.WORKING):
+                self.device_status = DeviceStatus.WORKING
+                logging.info(f"Device {self.device_id} started task {task.task_id}.")
 
         if self.current_task is None and self.tasks.empty():
-            if self.device_status != DeviceStatus.CREATED:
+            if self.device_status.transition(DeviceStatus.DONE):
                 self.device_status = DeviceStatus.DONE
                 logging.info(f"Device {self.device_id} is done.")
 
