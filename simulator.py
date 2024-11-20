@@ -230,6 +230,8 @@ class Server(Device):
         self.load += load
 
 
+from network_topology_manager import NetworkTopologyManager
+
 class NetworkManager:
 
     def __init__(self,
@@ -237,9 +239,16 @@ class NetworkManager:
                  server_context: ServerManagerContext):
         self.edge_device_context = edge_device_context
         self.server_context = server_context
+        self.topology_manager = NetworkTopologyManager()
 
     def calculate_delay(self, data_size, bandwidth) -> float:
         return data_size / bandwidth + random.uniform(0, 0.1)
+
+    def update_network(self):
+        self.topology_manager.update_topology()
+
+    def get_device_info(self, device_id):
+        return self.topology_manager.get_device_info(device_id)
 
 
 class TaskStatus(Enum):
