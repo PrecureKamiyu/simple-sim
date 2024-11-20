@@ -9,6 +9,8 @@ from queue import Queue
 logging.basicConfig(filename='simulator.log', level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 
+global_device_id_counter = 0
+
 class Scheduler:
     """
     Scheduler gets tasks and send tasks to managers.
@@ -93,9 +95,11 @@ class EdgeDeviceManagerContext:
         self.total = total
 
     def init(self):
+        global global_device_id_counter
         # create vm_list
-        for i in range(self.total):
-            self.vm_list.append(EdgeDevice(i))
+        for _ in range(self.total):
+            self.vm_list.append(EdgeDevice(global_device_id_counter))
+            global_device_id_counter += 1
 
 
 class EdgeDeviceManager:
@@ -134,9 +138,11 @@ class ServerManagerContext:
         self.total = total
 
     def init(self, server_manager: ServerManager):
+        global global_device_id_counter
         # create server list here
-        for i in range(self.total):
-            self.server_list.append(Server(i))
+        for _ in range(self.total):
+            self.server_list.append(Server(global_device_id_counter))
+            global_device_id_counter += 1
 
 
 class ServerManager:
