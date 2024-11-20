@@ -20,6 +20,16 @@ class TestNetworkTopologyManager(unittest.TestCase):
         self.topology_manager.update_topology()
         # Add assertions if needed
 
+    def test_simulate_device_failure(self):
+        self.topology_manager.add_device(1, {'name': 'Device1', 'type': 'EdgeDevice'})
+        self.topology_manager.simulate_device_failure()
+        self.assertIsNone(self.topology_manager.get_device_info(1))
+
+    def test_simulate_device_recovery(self):
+        initial_device_count = len(self.topology_manager.devices)
+        self.topology_manager.simulate_device_recovery()
+        self.assertEqual(len(self.topology_manager.devices), initial_device_count + 1)
+
     def test_get_device_info(self):
         self.topology_manager.add_device(1, {'name': 'Device1', 'type': 'EdgeDevice'})
         self.assertEqual(self.topology_manager.get_device_info(1), {'name': 'Device1', 'type': 'EdgeDevice'})
