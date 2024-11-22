@@ -1,0 +1,8 @@
+.aider*
+.env
+*.tex
+/module.py
+/mystrategy.py
+/design/
+/__pycache__/
+/*DeepSeek*
