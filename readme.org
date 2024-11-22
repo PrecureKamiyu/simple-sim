@@ -1,4 +1,91 @@
-* text one
+* roadmap
+
+** TODO 设置管理
+
+在 utils 文件里面，需要读取本地设置文件
+   - *Roadmap:*
+     - Implement validation methods in =ConfigurationLoader= to check the validity of configuration parameters.
+     - Add methods to save and load configurations from JSON or YAML files.
+
+** TODO 任务管理
+
+   - *Missing Sections:*
+     - *Task Prioritization:* Implement a priority system for tasks.
+     - *Task Error Handling:* Handle different types of task errors (e.g., timeouts, memory issues).
+
+** TODO 设备管理
+
+   - *Missing Sections:*
+     - *Resource Management:* Manage device resources (e.g., CPU, memory) and ensure tasks do not exceed these limits.
+
+** TODO 网络管理
+
+   - *Missing Sections:*
+     - *Network Topology:* Define and manage the network topology (e.g., mesh, star).
+     - *Network Congestion Handling:* Handle network congestion and adjust task transfer delays accordingly.
+
+** TODO offloading
+
+     - *Offloading Strategies:* Develop and implement different offloading strategies based on device capabilities and task requirements.
+
+** TODO 统计数据收集
+
+I intend to just use in-disk file to store the statistics.
+
+Implement methods in the =Device= class to track resource utilization.
+
+*** 1. /Define Statistics Storage/
+
+#+begin_src python
+class Statistics:
+    def __init__(self):
+        self.device_utilization = {}
+        self.task_delays = []
+
+    def record_device_utilization(self, device_id, utilization):
+        if device_id not in self.device_utilization:
+            self.device_utilization[device_id] = []
+        self.device_utilization[device_id].append(utilization)
+
+    def record_task_delay(self, task_id, delay):
+        self.task_delays.append((task_id, delay))
+
+    def get_average_task_delay(self):
+        if not self.task_delays:
+            return 0
+        total_delay = sum(delay for _, delay in self.task_delays)
+        return total_delay / len(self.task_delays)
+
+    def save_to_file(self, filename):
+        with open(filename, 'w') as f:
+            f.write(json.dumps({
+                'device_utilization': self.device_utilization,
+                'task_delays': self.task_delays
+            }))
+
+    @staticmethod
+    def load_from_file(filename):
+        with open(filename, 'r') as f:
+            data = json.loads(f.read())
+            stats = Statistics()
+            stats.device_utilization = data['device_utilization']
+            stats.task_delays = data['task_delays']
+            return stats
+#+end_src
+
+*** 2. retrieve statistics
+
+#+begin_src python
+def analyze_simulation_results(filename):
+    stats = Statistics.load_from_file(filename)
+    print(f"Average Task Delay: {stats.get_average_task_delay()}")
+    for device_id, utilizations in stats.device_utilization.items():
+        print(f"Device {device_id} Utilization: {sum(utilizations) / len(utilizations)}")
+#+end_src
+
+* texts
+
+** text one
 
 首先通过其他的设计过程中我写的文档你应该可以对这个问和我的简单设计有一些了解了，那么下面就具体展开讲一下我觉得需要提到的点。
 
@@ -32,7 +119,94 @@
 
 9.移动策略我这里没考虑，就当他们是静止的，传输策略就是 6 的设计，其他的暂时想不到了，有问题的话随时问我，我写的
 
-* text 简单设计
+** text 策略
+
+1. init
+2. start
+3. move_strategy
+4. task_generate_strategy
+5. offloading_strategy
+6. transmit_strategy
+7. scheduler
+
+** text 还需要考虑的问题
+
+任务类型：
+- 计算密集型任务：如图像处理、视频编码等，需要较高的计算资源。
+- 数据密集型任务：如大数据分析、机器学习模型训练等，需要较大的存储和内存资源。
+- 时间敏感型任务：如实时通信、在线游戏等，需要低延迟的通信和计算服务。
+
+通讯形式：
+- 无线传输：模拟不同频段、不同调制方式的无线通信，并考虑信号干扰、传输延迟等因素。
+- 有线传输：模拟不同带宽、不同延迟的有线通信，并考虑网络拥塞、丢包等问题。
+
+cost
+
+- 运行成本
+- 带宽成本
+- 内存成本
+- 存储成本（还没考虑存储）
+
+** text 问题描述
+
+计算架构：
+常见的架构为两层架构和三层架构
+
+1.两层架构将所有计算任务都放在边缘处理，适用于时间敏感的应用程序
+2.三层架构适用于同时具有时间敏感任务和计算密集型任务的应用程序。时间敏感任务在边缘处理，计算密集型任务在云上执行
+
+为此服务器类有如下特性：
+有子服务器（如云服务器和边缘服务器，边缘服务器和他自身的虚拟化资源或管理的其他服务器）
+有层级标识
+有坐标，暂时只考虑二维坐标
+服务器有手段访问它的父级、同级和子级服务器
+有子级的服务器自身可以有执行任务能力，也可以只管调度和传输
+
+卸载分类：
+（基于卸载流程）
+
+1.由边缘设备卸载到边缘服务器
+2.由边缘设备卸载到云服务器
+3.由边缘服务器卸载到自身所在集群的其他服务器
+4.任务为可分割的，不同部分卸载到不同层，如一部分用于本地执行，一部分用于边缘服务器，一部分为云服务器，最后一部分被拒绝。
+
+（基于卸载场景）
+1.一个边缘设备对应一个边缘服务器
+2.一个边缘设备对应多个边缘服务器，由边缘服务器决定是否卸载且卸载到哪个服务器
+3.多个边缘设备对应一个边缘服务器
+4.多个边缘设备对应多个边缘服务器
+
+卸载模式：
+1. 二进制模式：任务的数据集必须作为一个整体在 MEC 服务器上本地或远程执行。
+2. 部分卸载模式：允许任务分区。任务被划分为几个组件，这些组件被卸载到EC服务器，或者一些组件在本地执行。适用于由多个并行段组成的一些复杂任务。可以分为并行和顺序两类，并行只需要把每一部分各自分区即可，顺序需要考虑任务的先后顺序，用用向无环图表示。
+
+优化目标：找到最佳卸载比率，即卸载的比特与总比特的比率。
+
+暂时只考虑二进制模式。
+
+信道模型：
+多址技术：FDMA（频分多址）、TDMA（时分多址）、CDMA（码分多址）、SDMA（空分多址）、OFDMA（正交频分多址）。
+分为无干扰模型和有干扰模型，对此不是很了解
+
+需要考虑传输速率，基站连接设备数量的限制，基站与基站、基站与设备应该有传输速率限制
+
+计算卸载操作：
+卸载决策：任务卸载到哪，任务怎么分区。
+服务器选择：一对多场景，选择合适的服务器。
+无线资源分配：分配给任务的频率、时间等。
+传输功率设置：为任务传输设置适当的功率。
+计算资源分配：本地、边缘的计算资源分配。
+时隙划分：无线功率传输WPT场景。（EH、卸载）
+
+计算卸载目标：
+延迟最小化：传输延迟和执行延迟。
+能源消耗最小化：卸载的情况下传输和执行所消耗的能源。
+任务丢弃最小化：最小化由于资源不足而导致的任务丢弃。
+计算速率最大化：能量和计算资源限制的情况下。
+计算效率最大化：计算效率是总计算比特数除以消耗的能量。
+支付最小化：ED必须为EC或云计算中使用的资源付费的场景。
+
+** text 简单设计
 
 #+begin_example
 TASK_STATUS:
@@ -156,97 +330,9 @@ Scheduler：
     6.传输结果到用户
 
 由一个调度器对所有的任务进行调度，每个任务有多个状态，每个任务记录下一次被调度的的时间，每次调度最近需要被调度的任务，可以认为两次调度之间资源状态一致
+** 我的思路
 
-* text 问题描述
-
-计算架构：
-常见的架构为两层架构和三层架构
-
-1.两层架构将所有计算任务都放在边缘处理，适用于时间敏感的应用程序
-2.三层架构适用于同时具有时间敏感任务和计算密集型任务的应用程序。时间敏感任务在边缘处理，计算密集型任务在云上执行
-
-为此服务器类有如下特性：
-有子服务器（如云服务器和边缘服务器，边缘服务器和他自身的虚拟化资源或管理的其他服务器）
-有层级标识
-有坐标，暂时只考虑二维坐标
-服务器有手段访问它的父级、同级和子级服务器
-有子级的服务器自身可以有执行任务能力，也可以只管调度和传输
-
-卸载分类：
-（基于卸载流程）
-
-1.由边缘设备卸载到边缘服务器
-2.由边缘设备卸载到云服务器
-3.由边缘服务器卸载到自身所在集群的其他服务器
-4.任务为可分割的，不同部分卸载到不同层，如一部分用于本地执行，一部分用于边缘服务器，一部分为云服务器，最后一部分被拒绝。
-
-（基于卸载场景）
-1.一个边缘设备对应一个边缘服务器
-2.一个边缘设备对应多个边缘服务器，由边缘服务器决定是否卸载且卸载到哪个服务器
-3.多个边缘设备对应一个边缘服务器
-4.多个边缘设备对应多个边缘服务器
-
-卸载模式：
-1. 二进制模式：任务的数据集必须作为一个整体在 MEC 服务器上本地或远程执行。
-2. 部分卸载模式：允许任务分区。任务被划分为几个组件，这些组件被卸载到EC服务器，或者一些组件在本地执行。适用于由多个并行段组成的一些复杂任务。可以分为并行和顺序两类，并行只需要把每一部分各自分区即可，顺序需要考虑任务的先后顺序，用用向无环图表示。
-
-优化目标：找到最佳卸载比率，即卸载的比特与总比特的比率。
-
-暂时只考虑二进制模式。
-
-信道模型：
-多址技术：FDMA（频分多址）、TDMA（时分多址）、CDMA（码分多址）、SDMA（空分多址）、OFDMA（正交频分多址）。
-分为无干扰模型和有干扰模型，对此不是很了解
-
-需要考虑传输速率，基站连接设备数量的限制，基站与基站、基站与设备应该有传输速率限制
-
-计算卸载操作：
-卸载决策：任务卸载到哪，任务怎么分区。
-服务器选择：一对多场景，选择合适的服务器。
-无线资源分配：分配给任务的频率、时间等。
-传输功率设置：为任务传输设置适当的功率。
-计算资源分配：本地、边缘的计算资源分配。
-时隙划分：无线功率传输WPT场景。（EH、卸载）
-
-计算卸载目标：
-延迟最小化：传输延迟和执行延迟。
-能源消耗最小化：卸载的情况下传输和执行所消耗的能源。
-任务丢弃最小化：最小化由于资源不足而导致的任务丢弃。
-计算速率最大化：能量和计算资源限制的情况下。
-计算效率最大化：计算效率是总计算比特数除以消耗的能量。
-支付最小化：ED必须为EC或云计算中使用的资源付费的场景。
-
-* text 还需要考虑的问题
-
-任务类型：
-- 计算密集型任务：如图像处理、视频编码等，需要较高的计算资源。
-- 数据密集型任务：如大数据分析、机器学习模型训练等，需要较大的存储和内存资源。
-- 时间敏感型任务：如实时通信、在线游戏等，需要低延迟的通信和计算服务。
-
-通讯形式：
-- 无线传输：模拟不同频段、不同调制方式的无线通信，并考虑信号干扰、传输延迟等因素。
-- 有线传输：模拟不同带宽、不同延迟的有线通信，并考虑网络拥塞、丢包等问题。
-
-cost
-
-- 运行成本
-- 带宽成本
-- 内存成本
-- 存储成本（还没考虑存储）
-
-* text 策略
-
-1. init
-2. start
-3. move_strategy
-4. task_generate_strategy
-5. offloading_strategy
-6. transmit_strategy
-7. scheduler
-
-* 我的思路
-
-** prompt one
+*** prompt one
 
 我需要设计一个 MEC 网络的模拟器，现在来说，我们的类有这些：
 
@@ -263,21 +349,21 @@ cost
 - 计算任务可以向服务器 offloading，这个 offloading 的具体细节，比如说哪些任务 offloading、什么时候 offloading 的？
 - 计算任务的 offloading 的具体细节又是谁指定的？是设备自己还是有一个 offloading 管理器？
 
-** prompt two
+*** prompt two
 
 我对计算任务的模拟有一些疑惑，比如说
 - 计算任务是由谁来分配的？
 - 如何模拟 Device 或者是 Server 处理计算任务的过程？可能每个 Device 内部都有一个计时器？每次需要解决计算任务的时候就会为这个计时器加时间？
 - 模拟器的 main 程序的逻辑大概是什么样的？
 
-** prompt three
+*** prompt three
 
 我对 main 程序有一些疑惑
 
 - 我想要节点们完成任务的时候输出日志到本地文件之中用于分析
 - main 程序按照你的描述可以是一个对计算任务队列的调度的循环。但是我的想法是能不能让 main 程序是一个 ticker，每隔一段时间间隔就发送一个事件给其他的节点？
 
-** 设计
+*** 设计
 
 - 调度器：主要程序，ticker，发送任务消息给管理器们
 - 任务生成器：发送给 ticker 下一个时刻的任务需要、分配
@@ -285,104 +371,18 @@ cost
 - Server 管理器：管理 Server 们
 - 卸载管理器：拥有所有上面两个管理器的所有 context，为卸载进行决策，发送消息
 
-** prompt four
+*** prompt four
 
 我的模拟器其实并不是这个逻辑，scheduler 并不是真的物理实体，发送任务也只是 “虚拟” 地发送。传输只发生在 device 和服务器之间的通信。因为 offloading 有些计算任务会被传输到服务器上面，然后服务器再返回结果传输回来，或者将结果发送到指定的位置。只有在这个过程之中我需要考虑网络传输。请问在这种情况之下我该如何设计网络模块
+** network delay calculation
 
-* roadmap
-
-** TODO 设置管理
-
-在 utils 文件里面，需要读取本地设置文件
-   - *Roadmap:*
-     - Implement validation methods in =ConfigurationLoader= to check the validity of configuration parameters.
-     - Add methods to save and load configurations from JSON or YAML files.
-
-** TODO 任务管理
-
-   - *Missing Sections:*
-     - *Task Prioritization:* Implement a priority system for tasks.
-     - *Task Error Handling:* Handle different types of task errors (e.g., timeouts, memory issues).
-
-** TODO 设备管理
-
-   - *Missing Sections:*
-     - *Resource Management:* Manage device resources (e.g., CPU, memory) and ensure tasks do not exceed these limits.
-
-** TODO 网络管理
-
-   - *Missing Sections:*
-     - *Network Topology:* Define and manage the network topology (e.g., mesh, star).
-     - *Network Congestion Handling:* Handle network congestion and adjust task transfer delays accordingly.
-
-** TODO offloading
-
-     - *Offloading Strategies:* Develop and implement different offloading strategies based on device capabilities and task requirements.
-
-** TODO 统计数据收集
-
-I intend to just use in-disk file to store the statistics.
-
-Implement methods in the =Device= class to track resource utilization.
-
-*** 1. /Define Statistics Storage/
-
-#+begin_src python
-class Statistics:
-    def __init__(self):
-        self.device_utilization = {}
-        self.task_delays = []
-
-    def record_device_utilization(self, device_id, utilization):
-        if device_id not in self.device_utilization:
-            self.device_utilization[device_id] = []
-        self.device_utilization[device_id].append(utilization)
-
-    def record_task_delay(self, task_id, delay):
-        self.task_delays.append((task_id, delay))
-
-    def get_average_task_delay(self):
-        if not self.task_delays:
-            return 0
-        total_delay = sum(delay for _, delay in self.task_delays)
-        return total_delay / len(self.task_delays)
-
-    def save_to_file(self, filename):
-        with open(filename, 'w') as f:
-            f.write(json.dumps({
-                'device_utilization': self.device_utilization,
-                'task_delays': self.task_delays
-            }))
-
-    @staticmethod
-    def load_from_file(filename):
-        with open(filename, 'r') as f:
-            data = json.loads(f.read())
-            stats = Statistics()
-            stats.device_utilization = data['device_utilization']
-            stats.task_delays = data['task_delays']
-            return stats
-#+end_src
-
-*** 2. retrieve statistics
-
-#+begin_src python
-def analyze_simulation_results(filename):
-    stats = Statistics.load_from_file(filename)
-    print(f"Average Task Delay: {stats.get_average_task_delay()}")
-    for device_id, utilizations in stats.device_utilization.items():
-        print(f"Device {device_id} Utilization: {sum(utilizations) / len(utilizations)}")
-#+end_src
-
-* network delay calculation
-
-** prompt
+*** prompt
 
 I think the calculation of delay can be improved more. NetworkManager has the context of the devices. So network manager have the information of devices. What I want to do is that the module has all the information of the devices, and the connection situation between devices. NetworkManager should utilize those information for calculation of delay
 
 Absolutely, leveraging the full context of devices and their connections can significantly improve the accuracy of delay calculations. Here's a more comprehensive approach that takes into account the network topology, device capabilities, and current load on each device and connection.
 
-** Detailed Delay Calculation with Full Context
+*** Detailed Delay Calculation with Full Context
 
 1. /Base Delay Calculation:/
    - Calculate the base delay as the ratio of the data size to the available bandwidth.
@@ -412,7 +412,7 @@ Absolutely, leveraging the full context of devices and their connections can sig
    - Sum all the factors to get the total delay.
    \[ \text{Total Delay} = \text{Base Delay} + \text{Device Load Factor} + \text{Connection Quality Factor} + \text{Queue Length Factor} + \text{Network Load Factor} + \text{Random Factor} \]
 
-** Implementation in =NetworkManager=
+*** Implementation in =NetworkManager=
 
 Here's how you can implement the detailed delay calculation in the =NetworkManager= class:
 
@@ -475,7 +475,7 @@ class NetworkManager:
         return total_delay
 #+end_src
 
-** Usage Example
+*** Usage Example
 
 Here's how you can use the =calculate_delay= method in the =TaskManager= class:
 
