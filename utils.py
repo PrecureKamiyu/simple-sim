@@ -4,8 +4,9 @@ Import Protocol for OOP.
 from __future__ import annotations
 import logging
 from device_manager import EdgeDeviceManager, ServerManager
-from task import TaskManager
+from task import TaskManager, Task
 from context import EdgeDeviceManagerContext, ServerManagerContext
+from simulator import NetworkManager, Orchestrator, Scheduler
 
 logging.basicConfig(filename='utils.log', level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
