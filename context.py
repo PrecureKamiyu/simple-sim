@@ -5,7 +5,6 @@ from __future__ import annotations
 import random
 import logging
 from device import EdgeDevice, Server  # Import EdgeDevice and Server from device module
-from device_manager import ServerManager  # Import ServerManager from device_manager module
 
 logging.basicConfig(filename='context.log', level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
@@ -30,7 +29,7 @@ class ServerManagerContext:
         self.server_list: list = []
         self.total = total
 
-    def init(self, server_manager: ServerManager):
+    def init(self):
         global global_device_id_counter
         # create server list here
         for _ in range(self.total):
