@@ -2,11 +2,8 @@
 Context class.
 """
 from __future__ import annotations
-from enum import Enum
 import random
-from typing import Optional, List
 import logging
-from queue import Queue
 from device import EdgeDevice, Server  # Import EdgeDevice and Server from device module
 from device_manager import ServerManager  # Import ServerManager from device_manager module
 
