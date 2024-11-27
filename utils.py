@@ -60,7 +60,7 @@ class Runner():
 
         edge_device_manager: EdgeDeviceManager = EdgeDeviceManager(edge_device_context)
         server_manager: ServerManager = ServerManager(server_context)
-        network_manager: NetworkManager = NetworkManager(edge_device_context, server_context)
+        network_manager: NetworkManager = NetworkManager(edge_device_context, server_context)  # Corrected here
         task_manager: TaskManager = TaskManager(network_manager, config.tasks_number, config.tasks_size)
 
         orchestrator: Orchestrator = Orchestrator(edge_device_manager, server_manager, task_manager)
