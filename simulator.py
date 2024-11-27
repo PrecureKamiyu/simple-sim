@@ -146,14 +146,13 @@ class ServerManagerContext:
         global global_device_id_counter
         # create server list here
         for _ in range(self.total):
-            self.server_list.append(Server(global_device_id_counter))
+            self.server_list.append(Server(global_device_id_counter, x=random.uniform(0, 100), y=random.uniform(0, 100), coverage_range=random.uniform(0, 100)))
             global_device_id_counter += 1
 
 
 class ServerManager:
 
-    def __init__(self,
-                 server_context: ServerManagerContext):
+    def __init__(self, server_context: ServerManagerContext):
         self.context = server_context
         self.context.init(self)
         self.working_servers_count: int = 0
@@ -192,6 +191,13 @@ class ServerManager:
                 logging.info(f"Server {server.device_id} is done.")
         logging.info("Servers ran tasks.")
 
+    def get_server_info(self, server_id):
+        for server in self.context.server_list:
+            if server.device_id == server_id:
+                return server
+        return None
+
+
 class DeviceStatus(Enum):
     CREATED = "CREATED"
     WORKING = "WORKING"
@@ -204,6 +210,7 @@ class DeviceStatus(Enum):
             return True
         else:
             return False
+
 
 class Device:
     def __init__(self, device_id):
@@ -227,6 +234,42 @@ class Device:
 
     def add_task(self, task: Task):
         self.tasks.put(task)
+
+
+class EdgeDevice(Device):
+    def __init__(self,
+                 edge_device_id: int):
+        super().__init__(edge_device_id)
+
+
+class Server(Device):
+    def __init__(self, server_id: int, cpu_speed: float = 0, memory_size: int = 0, storage_size: int = 0, network_bandwidth: float = 0, x: float = 0, y: float = 0, coverage_range: float = 0):
+        super().__init__(server_id)
+        self.cpu_speed = cpu_speed
+        self.memory_size = memory_size
+        self.storage_size = storage_size
+        self.network_bandwidth = network_bandwidth
+        self.load = 0
+        self.cpu_utilization = 0.0
+        self.x = x
+        self.y = y
+        self.coverage_range = coverage_range
+        self.task_queue = Queue()
+
+    def assign_load(self, load: int):
+        self.load += load
+        self.cpu_utilization = self.calculate_cpu_utilization()
+
+    def calculate_cpu_utilization(self) -> float:
+        # Placeholder for CPU utilization calculation
+        return random.uniform(0.0, 1.0)
+
+    def allocate_resources(self, task: Task):
+        # Placeholder for resource allocation logic
+        pass
+
+    def add_task(self, task: Task):
+        self.task_queue.put(task)
 
     def run(self):
         if self.is_busy():
@@ -252,37 +295,6 @@ class Device:
                 self.device_status = DeviceStatus.DONE
                 logging.info(f"Device {self.device_id} is done.")
 
-
-class EdgeDevice(Device):
-    def __init__(self,
-                 edge_device_id: int):
-        super().__init__(edge_device_id)
-
-
-class Server(Device):
-    def __init__(self, server_id: int, cpu_speed: float = 0, memory_size: int = 0, storage_size: int = 0, network_bandwidth: float = 0):
-        super().__init__(server_id)
-        self.cpu_speed = cpu_speed
-        self.memory_size = memory_size
-        self.storage_size = storage_size
-        self.network_bandwidth = network_bandwidth
-        self.load = 0
-        self.cpu_utilization = 0.0
-
-    def assign_load(self, load: int):
-        self.load += load
-        self.cpu_utilization = self.calculate_cpu_utilization()
-
-    def calculate_cpu_utilization(self) -> float:
-        # Placeholder for CPU utilization calculation
-        return random.uniform(0.0, 1.0)
-
-    def allocate_resources(self, task: Task):
-        # Placeholder for resource allocation logic
-        pass
-
-
-from network_topology_manager import NetworkTopologyManager
 
 class NetworkManager:
 
