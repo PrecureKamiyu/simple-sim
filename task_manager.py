@@ -1,4 +1,5 @@
 import logging
+from task import Task, NetworkManager  # Import Task and NetworkManager from task module
 
 logging.basicConfig(filename='task_manager.log', level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
