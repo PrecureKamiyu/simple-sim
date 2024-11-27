@@ -12,6 +12,10 @@ from context import EdgeDeviceManagerContext, ServerManagerContext  # Import Edg
 logging.basicConfig(filename='device_manager.log', level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 
+class DeviceStatus(Enum):
+    DONE = "DONE"
+
+
 class DeviceManager:
     def __init__(self, device_context):
         self.context = device_context
@@ -29,13 +33,13 @@ class DeviceManager:
             device.run()
         logging.info("Edge devices ran tasks.")
 
-    def assign_tasks(self, tasks: list[Task]):
+    def assign_tasks(self, tasks: list):
         num_devices = len(self.context.vm_list)
         for i, task in enumerate(tasks):
             device_index = i % num_devices
             device = self.context.vm_list[device_index]
             device.add_task(task)
-            logging.info(f"Assigned task {task.task_id} to device {device.device_id}.")
+            logging.info(f"Assigned task {task} to device {device.device_id}.")
 
     def __init__(self, device_context):
         self.context = device_context
