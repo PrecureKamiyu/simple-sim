@@ -171,6 +171,14 @@ class ServerManager:
                 logging.info(f"Server {server.device_id} is done.")
         logging.info("Servers ran tasks.")
 
+    def balance_load(self):
+        # Placeholder for load balancing logic
+        pass
+
+    def distribute_tasks(self, tasks: List[Task]):
+        # Placeholder for task distribution logic
+        pass
+
     def example_distribute_load(self, load):
         for server in self.context.server_list:
             if server.load < 50:
