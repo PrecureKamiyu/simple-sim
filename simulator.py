@@ -268,8 +268,8 @@ class NetworkManager:
                  edge_device_context: EdgeDeviceManagerContext,
                  server_context: ServerManagerContext):
         self.edge_device_context = edge_device_context
-        self.server_context = server_context
-        self.topology_manager = NetworkTopologyManager()
+        self.server_context      = server_context
+        self.topology_manager    = NetworkTopologyManager()
 
     def calculate_delay(self, data_size, bandwidth) -> float:
         return data_size / bandwidth + random.uniform(0, 0.1)
