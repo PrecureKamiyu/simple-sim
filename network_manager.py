@@ -56,3 +56,4 @@ class NetworkManager:
 
     def assign_frequency(self, device_id, frequency):
         self.network_topology_manager.assign_frequency(device_id, frequency)
+        
