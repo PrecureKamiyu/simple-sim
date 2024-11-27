@@ -20,4 +20,4 @@ class TaskManager:
 
     def is_done(self) -> bool:
         # Check if all tasks are completed
-        return True
+        return all(task.status == TaskStatus.COMPLETED for task in self.generate_tasks())

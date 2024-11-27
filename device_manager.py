@@ -18,10 +18,8 @@ class EdgeDeviceManager:
         self.working_devices_count: int = 0
 
     def is_done(self) -> bool:
-        done = all(getattr(element, 'device_status') == DeviceStatus.DONE for element in self.context.vm_list)
-        if done:
-            logging.info("All edge devices are done.")
-        return done
+        # Check if all tasks are completed
+        return all(device.device_status == DeviceStatus.DONE for device in self.context.vm_list)
 
     def run(self):
         for device in self.context.vm_list:
@@ -52,10 +50,8 @@ class ServerManager:
         self.working_servers_count: int = 0
 
     def is_done(self) -> bool:
-        done = all(getattr(element, 'device_status') == DeviceStatus.DONE for element in self.context.server_list)
-        if done:
-            logging.info("All servers are done.")
-        return done
+        # Check if all tasks are completed
+        return all(server.device_status == DeviceStatus.DONE for server in self.context.server_list)
 
     def run(self):
         for server in self.context.server_list:
