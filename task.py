@@ -11,6 +11,11 @@ from queue import Queue
 logging.basicConfig(filename='task.log', level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 
+class TaskType(Enum):
+    NORMAL = "NORMAL"
+    # Add other task types as needed
+
+
 class TaskStatus(Enum):
     CREATED = "CREATED"
     WAIT_TO_UPLOAD = "WAIT_TO_UPLOAD"

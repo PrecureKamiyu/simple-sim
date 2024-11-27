@@ -7,6 +7,8 @@ import random
 from typing import Optional, List
 import logging
 from queue import Queue
+from device import EdgeDevice, Server  # Import EdgeDevice and Server from device module
+from device_manager import ServerManager  # Import ServerManager from device_manager module
 
 logging.basicConfig(filename='context.log', level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 

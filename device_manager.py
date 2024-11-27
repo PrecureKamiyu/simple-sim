@@ -9,6 +9,7 @@ import logging
 from queue import Queue
 from device import Device, EdgeDevice, Server, DeviceStatus  # Import Device, EdgeDevice, Server, and DeviceStatus from device module
 from task import Task, TaskStatus  # Import Task and TaskStatus from task module
+from context import EdgeDeviceManagerContext, ServerManagerContext  # Import EdgeDeviceManagerContext and ServerManagerContext from context module
 
 logging.basicConfig(filename='device_manager.log', level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
