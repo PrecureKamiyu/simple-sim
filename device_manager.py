@@ -7,7 +7,8 @@ import random
 from typing import Optional, List
 import logging
 from queue import Queue
-from device import Device, EdgeDevice, Server
+from device import Device, EdgeDevice, Server, DeviceStatus  # Import Device, EdgeDevice, Server, and DeviceStatus from device module
+from task import Task, TaskStatus  # Import Task and TaskStatus from task module
 
 logging.basicConfig(filename='device_manager.log', level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
@@ -36,6 +37,11 @@ class DeviceManager:
             device = self.context.vm_list[device_index]
             device.add_task(task)
             logging.info(f"Assigned task {task.task_id} to device {device.device_id}.")
+
+    def __init__(self, device_context):
+        self.context = device_context
+        self.context.init()
+        self.working_devices_count: int = 0
 
 
 class EdgeDeviceManager(DeviceManager):

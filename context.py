@@ -1,5 +1,5 @@
 """
-Server Manager Context class.
+Context class.
 """
 from __future__ import annotations
 from enum import Enum
@@ -7,16 +7,28 @@ import random
 from typing import Optional, List
 import logging
 from queue import Queue
-from device import Server  # Import Server from device module
-from context import EdgeDeviceManagerContext, ServerManagerContext  # Import EdgeDeviceManagerContext and ServerManagerContext from context module
 
-logging.basicConfig(filename='server_manager_context.log', level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+logging.basicConfig(filename='context.log', level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+
+
+class EdgeDeviceManagerContext:
+
+    def __init__(self, total: int):
+        self.vm_list: list = []
+        self.total = total
+
+    def init(self):
+        global global_device_id_counter
+        # create vm_list
+        for _ in range(self.total):
+            self.vm_list.append(EdgeDevice(global_device_id_counter))
+            global_device_id_counter += 1
 
 
 class ServerManagerContext:
 
     def __init__(self, total: int):
-        self.server_list: list[Server] = []
+        self.server_list: list = []
         self.total = total
 
     def init(self, server_manager: ServerManager):

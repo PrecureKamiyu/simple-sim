@@ -7,6 +7,7 @@ import random
 from typing import Optional, List
 import logging
 from queue import Queue
+from task import Task, TaskStatus  # Import Task and TaskStatus from task module
 
 logging.basicConfig(filename='device.log', level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
