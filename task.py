@@ -51,3 +51,22 @@ class Task:
         self.create_time  = create_time
         self.used_time    = used_time
         self.process_size = process_size
+
+
+class TaskManager:
+    def __init__(self, network_manager: NetworkManager, tasks_number: int, tasks_size: int):
+        self.network_manager = network_manager
+        self.tasks_number = tasks_number
+        self.tasks_size = tasks_size
+
+    def generate_tasks(self):
+        # Generate tasks based on the network topology and task requirements
+        tasks = []
+        for i in range(self.tasks_number):
+            task = Task(i, self.network_manager)
+            tasks.append(task)
+        return tasks
+
+    def is_done(self) -> bool:
+        # Check if all tasks are completed
+        return True
