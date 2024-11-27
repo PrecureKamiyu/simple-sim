@@ -1,3 +1,6 @@
+"""
+Network Manager class.
+"""
 import random
 import logging
 
@@ -6,16 +9,13 @@ logging.basicConfig(level=logging.INFO)
 class NetworkTopologyManager:
     def __init__(self):
         self.devices = {}
-        self.frequencies = {}
 
     def add_device(self, device_id, device_info):
         self.devices[device_id] = device_info
-        self.frequencies[device_id] = random.randint(100, 1000)
 
     def remove_device(self, device_id):
         if device_id in self.devices:
             del self.devices[device_id]
-            del self.frequencies[device_id]
 
     def update_topology(self):
         # Simulate network events and update the topology
@@ -38,22 +38,28 @@ class NetworkTopologyManager:
     def get_device_info(self, device_id):
         return self.devices.get(device_id, None)
 
-    def get_frequency(self, device_id):
-        return self.frequencies.get(device_id, None)
-
-    def assign_frequency(self, device_id, frequency):
-        self.frequencies[device_id] = frequency
 
 class NetworkManager:
-    def __init__(self, network_topology_manager: NetworkTopologyManager):
-        self.network_topology_manager = network_topology_manager
+    def __init__(self, edge_device_context: EdgeDeviceManagerContext, server_context: ServerManagerContext):
+        self.edge_device_context = edge_device_context
+        self.server_context = server_context
+
+    def get_edge_device_info(self, device_id):
+        return self.edge_device_context.vm_list[device_id]
+
+    def get_server_info(self, device_id):
+        return self.server_context.server_list[device_id]
 
     def get_device_info(self, device_id):
-        return self.network_topology_manager.get_device_info(device_id)
+        if device_id in self.edge_device_context.vm_list:
+            return self.edge_device_context.vm_list[device_id]
+        elif device_id in self.server_context.server_list:
+            return self.server_context.server_list[device_id]
+        else:
+            return None
 
     def get_frequency(self, device_id):
-        return self.network_topology_manager.get_frequency(device_id)
+        return random.randint(100, 1000)
 
     def assign_frequency(self, device_id, frequency):
-        self.network_topology_manager.assign_frequency(device_id, frequency)
-        
+        pass
