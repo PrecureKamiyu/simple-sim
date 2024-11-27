@@ -1,13 +1,7 @@
 """Import Protocol for OOP."""
 from __future__ import annotations
-from enum import Enum
-import random
-from typing import Optional, List
 import logging
-from queue import Queue
-from network_topology_manager import NetworkTopologyManager
 from device_manager import EdgeDeviceManager, ServerManager  # Import EdgeDeviceManager and ServerManager from device_manager module
-from task import Task, TaskStatus  # Import Task and TaskStatus from task module
 from task import TaskManager  # Import TaskManager from task module
 
 logging.basicConfig(filename='simulator.log', level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
