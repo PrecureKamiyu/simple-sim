@@ -9,7 +9,7 @@ from typing import List
 import logging
 from queue import Queue
 from context import EdgeDeviceManagerContext, ServerManagerContext  # Import EdgeDeviceManagerContext and ServerManagerContext from context module
-from task import Task  # Import Task from task module
+from network_manager import NetworkManager  # Import NetworkManager from network_manager module
 
 logging.basicConfig(filename='device_manager.log', level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
@@ -48,12 +48,10 @@ class DeviceManager:
         self.context.init()
         self.working_devices_count: int = 0
 
-
-class EdgeDeviceManager(DeviceManager):
-    def __init__(self, edge_device_context: EdgeDeviceManagerContext):
-        super().__init__(edge_device_context)
-
-
-class ServerManager(DeviceManager):
-    def __init__(self, server_context: ServerManagerContext):
-        super().__init__(server_context)
+    def communicate(self, network_manager: NetworkManager):
+        for device in self.context.vm_list:
+            frequency = network_manager.get_frequency(device.device_id)
+            if frequency:
+                logging.info(f"Device {device.device_id} is communicating on frequency {frequency}")
+            else:
+                logging.info(f"Device {device.device_id} does not have a frequency assigned")

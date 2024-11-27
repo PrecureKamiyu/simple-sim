@@ -3,6 +3,7 @@ from __future__ import annotations
 import logging
 from device_manager import EdgeDeviceManager, ServerManager  # Import EdgeDeviceManager and ServerManager from device_manager module
 from task import TaskManager  # Import TaskManager from task module
+from network_manager import NetworkManager  # Import NetworkManager from network_manager module
 
 logging.basicConfig(filename='simulator.log', level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
@@ -48,11 +49,13 @@ class Orchestrator:
     def __init__(self,
                  edge_device_manager: EdgeDeviceManager,
                  server_manager: ServerManager,
-                 task_manager: TaskManager):
+                 task_manager: TaskManager,
+                 network_manager: NetworkManager):
 
         self.edge_device_manager: EdgeDeviceManager = edge_device_manager
         self.server_manager = server_manager
         self.task_manager = task_manager
+        self.network_manager = network_manager
 
     def assign_tasks(self):
         if self.task_manager.is_done():
@@ -84,3 +87,7 @@ class Orchestrator:
         if done:
             logging.info("All tasks are completed.")
         return done
+
+    def communicate(self):
+        self.edge_device_manager.communicate(self.network_manager)
+        self.server_manager.communicate(self.network_manager)
