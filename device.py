@@ -7,8 +7,14 @@ import logging
 from typing import Optional, List
 from typing import List
 import logging
+from enum import Enum
 
 logging.basicConfig(filename='device.log', level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+
+
+class DeviceStatus(Enum):
+    CREATED = "CREATED"
+    DONE = "DONE"
 
 
 class EdgeDevice:

@@ -10,6 +10,7 @@ import logging
 from queue import Queue
 from context import EdgeDeviceManagerContext, ServerManagerContext  # Import EdgeDeviceManagerContext and ServerManagerContext from context module
 from network_manager import NetworkManager  # Import NetworkManager from network_manager module
+from task import Task, TaskType, TaskStatus  # Import Task, TaskType, and TaskStatus from task module
 
 logging.basicConfig(filename='device_manager.log', level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
