@@ -5,6 +5,7 @@ from __future__ import annotations
 from enum import Enum
 import random
 from typing import Optional, List
+from typing import List
 import logging
 from queue import Queue
 from context import EdgeDeviceManagerContext, ServerManagerContext  # Import EdgeDeviceManagerContext and ServerManagerContext from context module
@@ -33,7 +34,7 @@ class DeviceManager:
             device.run()
         logging.info("Edge devices ran tasks.")
 
-    def assign_tasks(self, tasks: list):
+    def assign_tasks(self, tasks: List[Task]):
         num_devices = len(self.context.vm_list)
         for i, task in enumerate(tasks):
             device_index = i % num_devices
