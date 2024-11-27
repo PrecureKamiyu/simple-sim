@@ -2,9 +2,10 @@
 from __future__ import annotations
 from enum import Enum
 import random
-from typing import Optional
+from typing import Optional, List
 import logging
 from queue import Queue
+from network_topology_manager import NetworkTopologyManager
 
 logging.basicConfig(filename='simulator.log', level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
@@ -129,11 +130,6 @@ class EdgeDeviceManager:
             device = self.context.vm_list[device_index]
             device.add_task(task)
             logging.info(f"Assigned task {task.task_id} to device {device.device_id}.")
-
-    def run(self):
-        for device in self.context.vm_list:
-            device.run()
-        logging.info("Edge devices ran tasks.")
 
 
 class ServerManagerContext:
