@@ -241,6 +241,30 @@ class EdgeDevice(Device):
                  edge_device_id: int):
         super().__init__(edge_device_id)
 
+    def run(self):
+        if self.is_busy():
+            self.efforts -= 1
+            logging.info(f"Device {self.device_id} task {self.current_task.task_id} efforts minus one.")
+            return
+
+        if self.current_task and self.current_task.status == TaskStatus.PROCESSING:
+            logging.info(f"Device {self.device_id} completed task {self.current_task.task_id}.")
+            self.current_task = None
+
+        if self.current_task is None and not self.tasks.empty():
+            task = self.tasks.get()
+            task.status = TaskStatus.PROCESSING
+            self.efforts = self.calculate_efforts(task.process_size)
+            self.current_task = task
+            if self.device_status.transition(DeviceStatus.WORKING):
+                self.device_status = DeviceStatus.WORKING
+                logging.info(f"Device {self.device_id} started task {task.task_id}.")
+
+        if self.current_task is None and self.tasks.empty():
+            if self.device_status.transition(DeviceStatus.DONE):
+                self.device_status = DeviceStatus.DONE
+                logging.info(f"Device {self.device_id} is done.")
+
 
 class Server(Device):
     def __init__(self, server_id: int, cpu_speed: float = 0, memory_size: int = 0, storage_size: int = 0, network_bandwidth: float = 0, x: float = 0, y: float = 0, coverage_range: float = 0):
@@ -281,8 +305,8 @@ class Server(Device):
             logging.info(f"Device {self.device_id} completed task {self.current_task.task_id}.")
             self.current_task = None
 
-        if self.current_task is None and not self.tasks.empty():
-            task = self.tasks.get()
+        if self.current_task is None and not self.task_queue.empty():
+            task = self.task_queue.get()
             task.status = TaskStatus.PROCESSING
             self.efforts = self.calculate_efforts(task.process_size)
             self.current_task = task
@@ -290,7 +314,7 @@ class Server(Device):
                 self.device_status = DeviceStatus.WORKING
                 logging.info(f"Device {self.device_id} started task {task.task_id}.")
 
-        if self.current_task is None and self.tasks.empty():
+        if self.current_task is None and self.task_queue.empty():
             if self.device_status.transition(DeviceStatus.DONE):
                 self.device_status = DeviceStatus.DONE
                 logging.info(f"Device {self.device_id} is done.")
