@@ -2,21 +2,13 @@
 Device Manager class.
 """
 from __future__ import annotations
-from enum import Enum
-import random
-from typing import Optional, List
 from typing import List
 import logging
-from queue import Queue
-from context import EdgeDeviceManagerContext, ServerManagerContext  # Import EdgeDeviceManagerContext and ServerManagerContext from context module
 from network_manager import NetworkManager  # Import NetworkManager from network_manager module
-from task import Task, TaskType, TaskStatus  # Import Task, TaskType, and TaskStatus from task module
+from task import Task
+from device import DeviceStatus
 
 logging.basicConfig(filename='device_manager.log', level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
-
-
-class DeviceStatus(Enum):
-    DONE = "DONE"
 
 
 class EdgeDeviceManager:

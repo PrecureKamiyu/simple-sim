@@ -2,10 +2,6 @@
 Device class.
 """
 from __future__ import annotations
-import random
-import logging
-from typing import Optional, List
-from typing import List
 import logging
 from enum import Enum
 
