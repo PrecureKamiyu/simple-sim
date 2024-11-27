@@ -252,12 +252,26 @@ class EdgeDevice(Device):
 
 
 class Server(Device):
-    def __init__(self, server_id: int):
+    def __init__(self, server_id: int, cpu_speed: float = 0, memory_size: int = 0, storage_size: int = 0, network_bandwidth: float = 0):
         super().__init__(server_id)
+        self.cpu_speed = cpu_speed
+        self.memory_size = memory_size
+        self.storage_size = storage_size
+        self.network_bandwidth = network_bandwidth
         self.load = 0
+        self.cpu_utilization = 0.0
 
     def assign_load(self, load: int):
         self.load += load
+        self.cpu_utilization = self.calculate_cpu_utilization()
+
+    def calculate_cpu_utilization(self) -> float:
+        # Placeholder for CPU utilization calculation
+        return random.uniform(0.0, 1.0)
+
+    def allocate_resources(self, task: Task):
+        # Placeholder for resource allocation logic
+        pass
 
 
 from network_topology_manager import NetworkTopologyManager

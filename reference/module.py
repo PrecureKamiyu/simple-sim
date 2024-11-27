@@ -156,10 +156,9 @@ class EdgeDeviceManager:
 class Server:
     def __init__(self, server_id: int, children: List['Server'] = [], coverage: float = 9999, level: int = 1,
                  x: float = 0, y: float = 0, cpu_speed: float = 0, current_time: float = 0, next_process_time: float = 0,
-                 memory_size: int = 0,
-                 storage_size: int = 0, rest_storage: int = 0,
-                 scheduling_task_queue: List[Task] = [],
-                 to_process_task_queue: List[Task] = [], processed_task_queue: List[Task] = []):
+                 memory_size: int = 0, storage_size: int = 0, rest_storage: int = 0,
+                 scheduling_task_queue: List[Task] = [], to_process_task_queue: List[Task] = [], processed_task_queue: List[Task] = [],
+                 cpu_utilization: float = 0.0, network_bandwidth: float = 0.0):
         self.id = server_id
         self.children = children
         self.coverage = coverage
@@ -176,7 +175,9 @@ class Server:
         self.scheduling_task_queue = scheduling_task_queue
         self.to_process_task_queue = to_process_task_queue
         self.processed_task_queue = processed_task_queue
-        self.channel_managers: Dict[str,'ChannelManager'] = {}  # 添加一个字典来存储ChannelManager对象
+        self.channel_managers: Dict[str, 'ChannelManager'] = {}
+        self.cpu_utilization = cpu_utilization
+        self.network_bandwidth = network_bandwidth
 
     def process_task(self):
         task = self.to_process_task_queue.pop()
@@ -188,6 +189,15 @@ class Server:
             self.memory_size -= task.input_size
             self.memory_size += task.output_size
             self.processed_task_queue.append(task)
+            self.cpu_utilization = self.calculate_cpu_utilization()
+
+    def calculate_cpu_utilization(self) -> float:
+        # Placeholder for CPU utilization calculation
+        return random.uniform(0.0, 1.0)
+
+    def allocate_resources(self, task: Task):
+        # Placeholder for resource allocation logic
+        pass
 
 # ServerManager类
 #     servers: Server[]
@@ -211,6 +221,14 @@ class ServerManager:
             return None
         else:
             return random.choice(nearest_servers)
+
+    def balance_load(self):
+        # Placeholder for load balancing logic
+        pass
+
+    def distribute_tasks(self, tasks: List[Task]):
+        # Placeholder for task distribution logic
+        pass
 
 
 # Channel:
