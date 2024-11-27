@@ -9,6 +9,7 @@ from typing import List
 import logging
 from queue import Queue
 from context import EdgeDeviceManagerContext, ServerManagerContext  # Import EdgeDeviceManagerContext and ServerManagerContext from context module
+from task import Task  # Import Task from task module
 
 logging.basicConfig(filename='device_manager.log', level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
